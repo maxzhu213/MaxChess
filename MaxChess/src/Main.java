@@ -42,10 +42,11 @@ public class Main extends JPanel implements ActionListener {
         timer = new Timer(25, this);
         frame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
         this.setOpaque(false);
+        frame.setResizable(false);
         frame.add(this);
         timer.start();
+        frame.setVisible(true);
     }
 
 

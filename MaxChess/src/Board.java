@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class Board {
 
-    private static final int SIZE = 8;
+    public static final int SIZE = 8;
     private final int SQUARE_SIZE = 80;
     private final int X_POS = 10;
     private final int Y_POS = 10;
@@ -43,11 +43,64 @@ public class Board {
     }
 
     public void draw(Graphics g) {
+        boolean checkmated = false;
+        boolean stalemated = false;
+
+        for (Piece piece: pieces) {
+            if (piece.isWhite == whiteMove) {
+                if (piece.inCheckMate(pieces)) {
+                    checkmated = true;
+                    break;
+                } else if (piece.inStaleMate(pieces)) {
+                    stalemated = true;
+                    break;
+                }
+            }
+        }
+
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 g.setColor((i + j) % 2 == 1 ? Color.DARK_GRAY : Color.LIGHT_GRAY);
                 g.fillRect(X_POS + i * SQUARE_SIZE, Y_POS + j * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
             }
+        }
+
+        if (checkmated) {
+            int kingX = -1, kingY = -1;
+            for (Piece piece: pieces) {
+                if (piece.type.equals("King") && piece.isWhite == whiteMove) {
+                    kingX = piece.x;
+                    kingY = piece.y;
+                }
+            }
+            g.setColor(Color.RED);
+            g.fillRect(X_POS + kingX * SQUARE_SIZE,
+                    Y_POS + kingY * SQUARE_SIZE,
+                    SQUARE_SIZE,
+                    SQUARE_SIZE);
+        } else if (stalemated) {
+            int kingX1 = -1, kingY1 = -1, kingX2 = -1, kingY2 = -1;
+            for (Piece piece: pieces) {
+                if (piece.type.equals("King")) {
+                    if (piece.isWhite == whiteMove) {
+                        kingX1 = piece.x;
+                        kingY1 = piece.y;
+                    } else {
+                        kingX2 = piece.x;
+                        kingY2 = piece.y;
+                    }
+                }
+            }
+
+            g.setColor(Color.YELLOW);
+            g.fillRect(X_POS + kingX1 * SQUARE_SIZE,
+                    Y_POS + kingY1 * SQUARE_SIZE,
+                    SQUARE_SIZE,
+                    SQUARE_SIZE);
+            g.fillRect(X_POS + kingX2 * SQUARE_SIZE,
+                    Y_POS + kingY2 * SQUARE_SIZE,
+                    SQUARE_SIZE,
+                    SQUARE_SIZE);
         }
 
         if (selected > -1) {
@@ -59,7 +112,7 @@ public class Board {
 
             for (int x = 0; x < SIZE; x++) {
                 for (int y = 0; y < SIZE; y++) {
-                    if (pieces.get(selected).legalMove(x, y, pieces, pieceLocations())) {
+                    if (pieces.get(selected).legalMove(x, y, pieces)) {
                         g.setColor(new Color(0, 255, 255, 50));
                         g.fillOval(X_POS + x * SQUARE_SIZE, Y_POS + y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
                     }
@@ -84,18 +137,18 @@ public class Board {
                     return;
                 }
             }
-        } else if (a[0] > -1 && selPiece.legalMove(a[0], a[1], pieces, pieceLocations())) {
+        } else if (a[0] > -1 && selPiece.legalMove(a[0], a[1], pieces)) {
 
             if  (a[0] == selPiece.x && a[1] == selPiece.y) {
                 selected = -1;
                 return;
             }
 
-            for (int i = 0; i < pieces.size(); i++) {
-                if (pieces.get(i).x == a[0] && pieces.get(i).y == a[1]) {
-                    pieces.get(i).x = SIZE;
-                    pieces.get(i).y = pieces.get(i).isWhite ? 7 : 0;
-                    pieces.get(i).type = "null";
+            for (Piece piece : pieces) {
+                if (piece.x == a[0] && piece.y == a[1]) {
+                    piece.x = SIZE;
+                    piece.y = piece.isWhite ? 7 : 0;
+                    piece.type = "null";
                 }
             }
 
@@ -106,7 +159,31 @@ public class Board {
             if (selPiece.type.equals("Pawn") && selPiece.y == (selPiece.isWhite ? 0 : 7)) {
                 pieces.remove(selPiece);
                 pieces.add(new Piece("Queen", selPiece.x, selPiece.y, selPiece.isWhite));
-                System.out.println("PROMOTION!");
+            }
+
+            if (selPiece.type.equals("King")) {
+                Piece rook = new Piece();
+                if (selPiece.moves == 1 && selPiece.x == 6) {
+                    for (Piece piece: pieces) {
+                        if (piece.x == 7 && piece.type.equals("Rook")) {
+                            rook = piece;
+                            break;
+                        }
+                    }
+
+                    rook.x = 5;
+                    rook.moves++;
+                } else if (selPiece.moves == 1 && selPiece.x == 2) {
+                    for (Piece piece: pieces) {
+                        if (piece.x == 0 && piece.type.equals("Rook")) {
+                            rook = piece;
+                            break;
+                        }
+                    }
+
+                    rook.x = 3;
+                    rook.moves++;
+                }
             }
 
             selected = -1;
@@ -140,10 +217,12 @@ public class Board {
         }
 
         for (Piece piece: pieces_) {
-            try {
-                a[piece.x][piece.y] = piece.isWhite ? 1 : -1;
-            } catch (ArrayIndexOutOfBoundsException e) {
+            if (!piece.type.equals("null")) {
+                try {
+                    a[piece.x][piece.y] = piece.isWhite ? 1 : -1;
+                } catch (ArrayIndexOutOfBoundsException e) {
 
+                }
             }
         }
 
