@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * Created by Max on 2018-04-25.
  */
 
-public class Piece {
+class Piece {
 
     boolean isWhite;
 
@@ -141,10 +141,7 @@ public class Piece {
                 return true;
             }
             case "King":
-                if (Math.abs(x_ - x) < 2 && Math.abs(y_ - y) < 2) {
-                    return true;
-                }
-                return canCastle(pieces, x_, y_);
+                return Math.abs(x_ - x) < 2 && Math.abs(y_ - y) < 2 || canCastle(pieces, x_, y_);
         }
         return false;
     }
@@ -240,9 +237,7 @@ public class Piece {
             }
         }
 
-        if (inCheck(pieces_)) return false;
-
-        return true;
+        return !inCheck(pieces_);
     }
 
     void draw(Graphics g, int x, int y, int w, int h) {

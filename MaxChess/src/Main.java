@@ -1,30 +1,25 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Max on 2018-04-25.
  */
 public class Main extends JPanel implements ActionListener {
 
-    final String TITLE = "Max Chess";
-    final int SCREEN_WIDTH = 800;
-    final int SCREEN_HEIGHT = 690;
+    private final String TITLE = "Max Chess";
+    private final int SCREEN_WIDTH = 800;
+    private final int SCREEN_HEIGHT = 690;
 
+    private JFrame frame;
+    private Timer timer;
 
-    JFrame frame;
-    Timer timer;
+    private Board board;
 
-    Board board;
-
-
-    Main() {
+    private Main() {
         setUpFrame();
         board = new Board();
         this.addMouseListener(new MouseAdapter() {
@@ -36,8 +31,7 @@ public class Main extends JPanel implements ActionListener {
         });
     }
 
-
-    public void setUpFrame() {
+    private void setUpFrame() {
         frame = new JFrame(TITLE);
         timer = new Timer(25, this);
         frame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -49,7 +43,6 @@ public class Main extends JPanel implements ActionListener {
         frame.setVisible(true);
     }
 
-
     public static void main(String[] args) {
         Main main = new Main();
     }
@@ -57,11 +50,9 @@ public class Main extends JPanel implements ActionListener {
 
     @Override
     public void paintComponent(Graphics g) {
-
         if (board != null) {
             board.draw(g);
         }
-
     }
 
     @Override

@@ -1,13 +1,12 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Max on 2018-04-25.
  */
-public class Board {
+class Board {
 
-    public static final int SIZE = 8;
+    static final int SIZE = 8;
     private final int SQUARE_SIZE = 80;
     private final int X_POS = 10;
     private final int Y_POS = 10;
@@ -18,7 +17,7 @@ public class Board {
 
     private ArrayList<Piece> pieces;
 
-    public Board() {
+    Board() {
         whiteMove = true;
         selected = -1;
         pieces = new ArrayList<>();
@@ -42,7 +41,7 @@ public class Board {
 
     }
 
-    public void draw(Graphics g) {
+    void draw(Graphics g) {
         boolean checkmated = false;
         boolean stalemated = false;
 
@@ -125,7 +124,7 @@ public class Board {
         }
     }
 
-    public void onClick(int x, int y) {
+    void onClick(int x, int y) {
         int a[] = clickedSquare(x, y);
 
         Piece selPiece = selected > -1 ? pieces.get(selected) : new Piece();
@@ -144,13 +143,11 @@ public class Board {
                 return;
             }
 
-            for (Piece piece : pieces) {
-                if (piece.x == a[0] && piece.y == a[1]) {
-                    piece.x = SIZE;
-                    piece.y = piece.isWhite ? 7 : 0;
-                    piece.type = "null";
-                }
-            }
+            pieces.stream().filter(piece -> piece.x == a[0] && piece.y == a[1]).forEach(piece -> {
+                piece.x = SIZE;
+                piece.y = piece.isWhite ? 7 : 0;
+                piece.type = "null";
+            });
 
             selPiece.x = a[0];
             selPiece.y = a[1];
@@ -165,7 +162,7 @@ public class Board {
                 Piece rook = new Piece();
                 if (selPiece.moves == 1 && selPiece.x == 6) {
                     for (Piece piece: pieces) {
-                        if (piece.x == 7 && piece.type.equals("Rook")) {
+                        if (piece.x == 7 && piece.type.equals("Rook") && piece.isWhite == whiteMove) {
                             rook = piece;
                             break;
                         }
@@ -175,7 +172,7 @@ public class Board {
                     rook.moves++;
                 } else if (selPiece.moves == 1 && selPiece.x == 2) {
                     for (Piece piece: pieces) {
-                        if (piece.x == 0 && piece.type.equals("Rook")) {
+                        if (piece.x == 0 && piece.type.equals("Rook") && piece.isWhite == whiteMove) {
                             rook = piece;
                             break;
                         }
@@ -207,7 +204,7 @@ public class Board {
         return a;
     }
 
-    public static int[][] pieceLocations(ArrayList<Piece> pieces_) {
+    static int[][] pieceLocations(ArrayList<Piece> pieces_) {
         int a[][] = new int[SIZE][SIZE];
 
         for (int x = 0; x < SIZE; x++) {
@@ -216,21 +213,15 @@ public class Board {
             }
         }
 
-        for (Piece piece: pieces_) {
-            if (!piece.type.equals("null")) {
-                try {
-                    a[piece.x][piece.y] = piece.isWhite ? 1 : -1;
-                } catch (ArrayIndexOutOfBoundsException e) {
+        pieces_.stream().filter(piece -> !piece.type.equals("null")).forEach(piece -> {
+            try {
+                a[piece.x][piece.y] = piece.isWhite ? 1 : -1;
+            } catch (ArrayIndexOutOfBoundsException ignored) {
 
-                }
             }
-        }
+        });
 
         return a;
-    }
-
-    private int[][] pieceLocations() {
-        return pieceLocations(this.pieces);
     }
 
     private boolean isIn(int x, int y, Rectangle r) {
