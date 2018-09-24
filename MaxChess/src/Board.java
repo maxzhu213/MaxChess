@@ -45,6 +45,7 @@ class Board {
         boolean checkmated = false;
         boolean stalemated = false;
 
+        // Checkmate/stalemate detection
         for (Piece piece: pieces) {
             if (piece.isWhite == whiteMove) {
                 if (piece.inCheckMate(pieces)) {
@@ -57,6 +58,7 @@ class Board {
             }
         }
 
+        // Draw the board 
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 g.setColor((i + j) % 2 == 1 ? Color.DARK_GRAY : Color.LIGHT_GRAY);
@@ -64,6 +66,7 @@ class Board {
             }
         }
 
+        // Draw different colours if a player is in checkmate or stalemate
         if (checkmated) {
             int kingX = -1, kingY = -1;
             for (Piece piece: pieces) {
@@ -102,6 +105,7 @@ class Board {
                     SQUARE_SIZE);
         }
 
+        // Highlight the selected square
         if (selected > -1) {
             g.setColor(Color.GREEN);
             g.fillRect(X_POS + pieces.get(selected).x * SQUARE_SIZE,
@@ -119,11 +123,13 @@ class Board {
             }
         }
 
+        // Draw the pieces
         for (Piece piece : pieces) {
             piece.draw(g, X_POS + piece.x * SQUARE_SIZE, Y_POS + piece.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
         }
     }
 
+    // CLick detection
     void onClick(int x, int y) {
         int a[] = clickedSquare(x, y);
 
@@ -189,7 +195,7 @@ class Board {
             selected = -1;
         }
     }
-
+    
     private int[] clickedSquare(int x, int y) {
         int a[] = {-1, -1};
         for (int i = 0; i < SIZE; i++) {
